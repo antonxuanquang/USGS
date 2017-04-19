@@ -6,7 +6,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLDecoder;
+
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
@@ -15,24 +18,33 @@ public class Control implements ActionListener {
 	Model model;
 	View view;
 	private String siteList;
+	String decodedPath;
 
 	public Control(Model model, View view) {
 		this.model = model;
 		this.view = view;
+		
+		String path = Control.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		try {
+			decodedPath = URLDecoder.decode(path, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		view.chooseFile.addActionListener(this);
 		view.run.addActionListener(this);
 	}
 
 	protected void chooseSiteFile() {
-		JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+		JFileChooser fc = new JFileChooser(decodedPath);
 
 		int returnVal = fc.showOpenDialog(view.chooseFile);
 
 		if (returnVal == 0) {
 			File file = fc.getSelectedFile();
 
-			siteList = file.getName();
+			siteList = file.getPath();
 			view.report.setText("Get site list from " + file.getName() + "." + "\n");
 			view.run.setEnabled(true);
 		} else {
@@ -42,7 +54,7 @@ public class Control implements ActionListener {
 
 	public void fetchDescription() {
 		try {
-			File file = new File("site_description.csv");
+			File file = new File(decodedPath + "site_description.csv");
 			file.createNewFile();
 
 			File citeFile = new File(siteList);
@@ -71,7 +83,7 @@ public class Control implements ActionListener {
 			while ((inputLine = br.readLine()) != null) {
 				try {
 					model.fetchDescription(bw, inputLine, 
-							view.firstPartDescription.getText(), view.secondPartDescription.getText());
+							view.firstPartDescription.getText().trim(), view.secondPartDescription.getText().trim());
 					view.report.append("Done with site " + inputLine + "\n");
 					view.repaint();
 				} catch (Exception e) {
@@ -91,7 +103,8 @@ public class Control implements ActionListener {
 
 	public void fetchData() {
 		try {
-			File file = new File("site_data.csv");
+			File file = new File(decodedPath + "site_data.csv");
+			System.out.println(file.getPath());
 			file.createNewFile();
 
 			File citeFile = new File(siteList);
@@ -106,7 +119,7 @@ public class Control implements ActionListener {
 			while ((inputLine = br.readLine()) != null) {
 				try {
 					model.fetchData(bw, inputLine,
-							view.firstPartData.getText(), view.secondPartData.getText());
+							view.firstPartData.getText().trim(), view.secondPartData.getText().trim());
 					view.report.append("Done with site " + inputLine + "\n");
 					view.repaint();
 				} catch (Exception e) {
