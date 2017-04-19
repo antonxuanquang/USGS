@@ -67,15 +67,18 @@ public class Control implements ActionListener {
 					+ "gw_count_nu,sv_begin_date,sv_end_date,sv_count_nu\n");
 
 			String inputLine;
-
+			view.report.append("Start Fetching Site Descriptions\n");
 			while ((inputLine = br.readLine()) != null) {
 				try {
-					model.fetchDescription(bw, inputLine);
+					model.fetchDescription(bw, inputLine, 
+							view.firstPartDescription.getText(), view.secondPartDescription.getText());
 					view.report.append("Done with site " + inputLine + "\n");
+					view.repaint();
 				} catch (Exception e) {
 					view.report.append("Error! Can't pull description from site " + inputLine + "\n");
 				}
 			}
+			view.report.append("Finish Fetchich Site Descriptions\n");
 
 			bw.close();
 			br.close();
@@ -96,18 +99,21 @@ public class Control implements ActionListener {
 
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(
-					"agency_cd,site_no,datetime,00060_00003,00060_00003_cd,80154_00003,80154_00003_cd,80155_00003,80155_00003_cd\n");
+			bw.write("agency_cd,site_no,datetime,00060_00003,00060_00003_cd,80154_00003,80154_00003_cd,80155_00003,80155_00003_cd\n");
 
 			String inputLine;
+			view.report.append("Start Fetching Site Data\n");
 			while ((inputLine = br.readLine()) != null) {
 				try {
-					model.fetchData(bw, inputLine);
+					model.fetchData(bw, inputLine,
+							view.firstPartData.getText(), view.secondPartData.getText());
 					view.report.append("Done with site " + inputLine + "\n");
+					view.repaint();
 				} catch (Exception e) {
 					view.report.append("Error! Can't pull data from site " + inputLine + "\n");
 				}
 			}
+			view.report.append("Finish Fetching Site Data\n");
 
 			bw.close();
 			br.close();
@@ -122,8 +128,8 @@ public class Control implements ActionListener {
 		Model model = new Model();
 		View view = new View();
 		Control control = new Control(model, view);
-		view.chooseFile.doClick();
-		view.run.doClick();
+//		view.chooseFile.doClick();
+//		view.run.doClick();
 	}
 
 	@Override
